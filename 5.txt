@@ -1,0 +1,75 @@
+#include <LiquidCrystal.h>
+
+#define SENSOR_PIN A0 
+#define LED_AZUL_PIN 3
+#define LED_ROJO_PIN 2
+#define BOMBA_PIN A1 
+#define BUZZER_PIN 4
+#define UM_BRAL_MIN 20
+#define UM_BRAL_MAX 50
+#define TIEMPO_RIEGO 10000 
+#define TIEMPO_IDLE 15000 
+
+LiquidCrystal lcd(41, 40, 39, 38, 37, 36);
+bool flag = 0;
+
+void setup() {
+  lcd.begin(16, 2);
+  pinMode(SENSOR_PIN, INPUT);
+  pinMode(LED_AZUL_PIN, OUTPUT);
+  pinMode(BOMBA_PIN, OUTPUT);
+  pinMode(LED_ROJO_PIN, OUTPUT);
+  pinMode(BUZZER_PIN, OUTPUT);
+  lcd.print("Sistema de Riego");
+  
+}
+
+
+int obtenerHumedad() {
+  // Leer la humedad desde el sensor HW-080
+  int lectura = analogRead(SENSOR_PIN);
+  // Convertir el valor de lectura a un porcentaje de humedad (0-100)
+  int humedad = 100 - map(lectura, 0, 1023, 0, 100);
+  return humedad;
+}
+
+
+void loop() {
+  int humedad = obtenerHumedad();
+  //int humedad = 85;
+  
+  lcd.clear();
+  lcd.setCursor(0, 0);
+  lcd.print("Humedad: ");
+  lcd.print(humedad);
+  lcd.print("%");
+  
+  
+  delay(1000);
+  
+ 
+  if (humedad < UM_BRAL_MIN) {
+
+    digitalWrite(LED_AZUL_PIN, HIGH);
+    digitalWrite(BOMBA_PIN, LOW);
+    delay(TIEMPO_RIEGO);
+    digitalWrite(LED_AZUL_PIN, LOW);
+    digitalWrite(BOMBA_PIN, HIGH);
+    lcd.clear();
+    lcd.setCursor(0, 0);
+    lcd.print("Sistema esperando");
+    delay(TIEMPO_IDLE);
+ 
+  } else if (humedad > UM_BRAL_MAX) {
+    // Planta sobre-hidratada
+    digitalWrite(BOMBA_PIN, HIGH);
+    digitalWrite(LED_ROJO_PIN, HIGH);
+    tone(BUZZER_PIN, 1000);
+    delay(1000);
+    noTone(BUZZER_PIN);
+    digitalWrite(LED_ROJO_PIN, LOW);
+    delay(5000);
+  }
+  
+  
+}
