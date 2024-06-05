@@ -1,0 +1,40 @@
+#define LED_AMARILLO 2
+
+
+
+const int Trigger = 6;  
+const int Echo = 5;
+
+void setup()
+{
+  pinMode(LED_AMARILLO, OUTPUT);
+  pinMode(Trigger, OUTPUT);
+  pinMode(Echo, INPUT);
+  digitalWrite(Trigger, LOW);
+}
+
+void loop()
+{
+ 
+  long tiempo;
+  long distancia;
+ 
+  digitalWrite(Trigger, HIGH);
+  delayMicroseconds(10);        
+  digitalWrite(Trigger, LOW);
+ 
+  tiempo = pulseIn(Echo, HIGH);
+  distancia = tiempo/59;            
+ 
+ 
+  if (distancia <= 30)
+  {
+  digitalWrite(LED_AMARILLO, HIGH);
+ 
+  }
+  else{
+   
+    digitalWrite(LED_AMARILLO, LOW);
+  }
+ 
+}

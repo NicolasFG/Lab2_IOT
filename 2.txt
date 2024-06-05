@@ -1,0 +1,69 @@
+#include <LiquidCrystal.h>
+#include <Keypad.h>
+
+LiquidCrystal lcd(41, 40, 39, 38, 37, 36);
+
+const int verdePin = 8; 
+const int rojoPin = 9; 
+
+const char contrasena[] = "1234"; 
+char intento[5]; 
+
+const byte filas = 4; 
+const byte columnas = 4; 
+
+char teclas[filas][columnas] = {
+  {'1', '2', '3', 'A'},
+  {'4', '5', '6', 'B'},
+  {'7', '8', '9', 'C'},
+  {'*', '0', '#', 'D'}
+};
+
+byte pinFilas[filas] = {14, 15, 16, 17}; 
+byte pinColumnas[columnas] = {18, 19, 20, 21}; 
+
+Keypad keypad = Keypad(makeKeymap(teclas), pinFilas, pinColumnas, filas, columnas);
+
+void setup() {
+  lcd.begin(16, 2);
+  pinMode(verdePin, OUTPUT);
+  pinMode(rojoPin, OUTPUT);
+}
+
+void loop() {
+
+  lcd.clear();
+  lcd.print("Ingrese Contraseña:");
+
+  char key = keypad.getKey();
+  int index = 0;
+  while (key != '#') { 
+    if (key) {
+      intento[index++] = key; 
+      lcd.print(key);
+    }
+    key = keypad.getKey(); 
+    delay(100);
+  }
+  intento[index] = '\0'; 
+
+  if (strcmp(intento, contrasena) == 0) {
+
+    lcd.clear();
+    lcd.print("Contraseña Correcta");
+    digitalWrite(verdePin, HIGH); 
+    delay(2000); 
+    digitalWrite(verdePin, LOW);
+  } else {
+
+    lcd.clear();
+    lcd.print("Contraseña Incorrecta");
+    digitalWrite(rojoPin, HIGH); 
+    delay(2000); 
+    digitalWrite(rojoPin, LOW); 
+  }
+
+  memset(intento, 0, sizeof(intento));
+
+  delay(1000); 
+}

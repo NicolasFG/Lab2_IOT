@@ -1,0 +1,167 @@
+#include <LiquidCrystal.h>
+#include <Keypad.h>
+
+LiquidCrystal lcd(41, 40, 39, 38, 37, 36);
+
+const int verdePin = 8;
+const int rojoPin = 9;
+const int amarilloPin = 4;
+
+const int Trigger = 2;
+const int Echo = 3;
+
+const char contrasena[] = "1234";
+char intento[5];
+
+const byte filas = 4;
+const byte columnas = 4;
+
+char teclas[filas][columnas] = {
+  {'1', '2', '3', 'A'},
+  {'4', '5', '6', 'B'},
+  {'7', '8', '9', 'C'},
+  {'*', '0', '#', 'D'}
+};
+
+byte pinFilas[filas] = {14, 15, 16, 17};
+byte pinColumnas[columnas] = {18, 19, 20, 21};
+
+Keypad keypad = Keypad(makeKeymap(teclas), pinFilas, pinColumnas, filas, columnas);
+
+bool personaCerca = false;
+
+void setup() {
+  lcd.begin(16, 2);
+  pinMode(verdePin, OUTPUT);
+  pinMode(rojoPin, OUTPUT);
+  pinMode(amarilloPin, OUTPUT);
+  pinMode(Trigger, OUTPUT);
+  pinMode(Echo, INPUT);
+  digitalWrite(Trigger, LOW);
+}
+
+bool verificarPersona(){
+
+    long tiempo;
+    long distancia;
+    bool personaCerca;
+
+    digitalWrite(Trigger, HIGH);
+    delayMicroseconds(10);
+    digitalWrite(Trigger, LOW);
+
+    tiempo = pulseIn(Echo, HIGH);
+    distancia = tiempo / 59;
+
+    if (distancia <= 30) { // Cambia este valor según la distancia a la que deseas activar el sistema
+      personaCerca = true;
+      digitalWrite(amarilloPin, HIGH); // Enciende el LED amarillo
+      lcd.display(); // Enciende la luz del LCD
+      
+    } else {
+      personaCerca = false;
+      digitalWrite(amarilloPin, LOW); // Apaga el LED amarillo
+      lcd.noDisplay(); // Apaga la luz del LCD
+    }
+  return personaCerca;
+}
+
+void loop() {
+
+  bool personaCerca;
+  
+  if (!verificarPersona()){
+    return;
+  }
+  
+  personaCerca = verificarPersona();
+
+
+  if (personaCerca){
+
+    if (!verificarPersona()){
+    return;
+  }
+
+    lcd.clear();
+    lcd.print("Ingrese Contraseña:");
+
+    if (!verificarPersona()){
+    return;
+  }
+
+    char key = keypad.getKey();
+    int index = 0;
+
+    if (!verificarPersona()){
+    return;
+  }
+    while (key != '#') {
+      if (!verificarPersona()){
+    return;
+  }
+      if (key) {
+        intento[index++] = key;
+        lcd.print(key);
+      }
+      if (!verificarPersona()){
+    return;
+  }
+      key = keypad.getKey();
+      if (!verificarPersona()){
+    return;
+  }
+      delay(100);
+      if (!verificarPersona()){
+    return;
+  }
+    }
+    intento[index] = '\0';
+    if (!verificarPersona()){
+    return;
+  }
+  if (!verificarPersona()){
+    return;
+  }
+    if (strcmp(intento, contrasena) == 0) {
+      if (!verificarPersona()){
+    return;
+  }
+      lcd.clear();
+      lcd.print("Contraseña Correcta");
+      if (!verificarPersona()){
+    return;
+  }
+      digitalWrite(verdePin, HIGH);
+      delay(2000);
+      digitalWrite(verdePin, LOW);
+      if (!verificarPersona()){
+    return;
+  }
+    } else {
+      if (!verificarPersona()){
+    return;
+  }
+      lcd.clear();
+      lcd.print("Contraseña Incorrecta");
+      digitalWrite(rojoPin, HIGH);
+      if (!verificarPersona()){
+    return;
+  }
+      delay(2000);
+      digitalWrite(rojoPin, LOW);
+      if (!verificarPersona()){
+    return;
+  }
+    }
+
+    memset(intento, 0, sizeof(intento));
+    if (!verificarPersona()){
+    return;
+  }
+
+    delay(1000);
+
+  }
+  
+}
